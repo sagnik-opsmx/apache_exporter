@@ -1,19 +1,10 @@
-# This configuration was automatically generated from a CircleCI 1.0 config.
-# It should include any build commands you had along with commands that CircleCI
-# inferred from your project structure. We strongly recommend you read all the
-# comments in this file to understand the structure of CircleCI 2.0, as the idiom
-# for configuration has changed substantially in 2.0 to allow arbitrary jobs rather
-# than the prescribed lifecycle of 1.0. In general, we recommend using this generated
-# configuration as a reference rather than using it in production, though in most
-# cases it should duplicate the execution of your original 1.0 config.
 version: 2
 jobs:
   build:
     working_directory: ~/Lusitaniae/apache_exporter
     parallelism: 1
     shell: /bin/bash --login
-    # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
-    # If any of these refer to each other, rewrite them so that they don't or see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables .
+
     environment:
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
@@ -21,58 +12,39 @@ jobs:
       QUAY_IMAGE_NAME: quay.io/lusitaniae/apache-exporter
       DOCKER_TEST_IMAGE_NAME: quay.io/prometheus/golang-builder:1.8-base
       REPO_PATH: github.com/Lusitaniae/apache_exporter
-    # In CircleCI 1.0 we used a pre-configured image with a large number of languages and other packages.
-    # In CircleCI 2.0 you can now specify your own image, or use one of our pre-configured images.
-    # The following configuration line tells CircleCI to use the specified docker image as the runtime environment for you job.
-    # We have selected a pre-built image that mirrors the build environment we use on
-    # the 1.0 platform, but we recommend you choose an image more tailored to the needs
-    # of each job. For more information on choosing an image (or alternatively using a
-    # VM instead of a container) see https://circleci.com/docs/2.0/executor-types/
-    # To see the list of pre-built images that CircleCI provides for most common languages see
-    # https://circleci.com/docs/2.0/circleci-images/
+
     docker:
     - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
       command: /sbin/init
+
     steps:
-    # Machine Setup
-    #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
-    # The following `checkout` command checks out your code to your working directory. In 1.0 we did this implicitly. In 2.0 you can choose where in the course of a job your code should be checked out.
     - checkout
-    # Prepare for artifact and test results  collection equivalent to how it was done on 1.0.
-    # In many cases you can simplify this from what is generated here.
-    # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
+
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
-    # This is based on your 1.0 configuration file or project settings
+
     - run:
         working_directory: ~/Lusitaniae/apache_exporter
         command: sudo curl -L -o /usr/bin/docker 'https://s3-external-1.amazonaws.com/circle-downloads/docker-1.9.1-circleci'
+
     - run:
         working_directory: ~/Lusitaniae/apache_exporter
         command: sudo chmod 0755 /usr/bin/docker
+
     - run:
         working_directory: ~/Lusitaniae/apache_exporter
         command: sudo curl -L 'https://github.com/aktau/github-release/releases/download/v0.6.2/linux-amd64-github-release.tar.bz2' | tar xvjf - --strip-components 3 -C $HOME/bin
-    # This is based on your 1.0 configuration file or project settings
+
     - run:
         working_directory: ~/Lusitaniae/apache_exporter
         command: echo -e "export DOCKER_IMAGE_NAME=lusotycoon/apache-exporter\nexport QUAY_IMAGE_NAME=quay.io/lusitaniae/apache-exporter\nexport DOCKER_TEST_IMAGE_NAME=quay.io/prometheus/golang-builder:1.8-base\nexport REPO_PATH=github.com/Lusitaniae/apache_exporter" >> $BASH_ENV
+
     - run:
         working_directory: ~/Lusitaniae/apache_exporter
         command: 'sudo docker info >/dev/null 2>&1 || sudo service docker start; '
-    # Dependencies
-    #   This would typically go in either a build or a build-and-test job when using workflows
-    # Restore the dependency cache
-    - restore_cache:
-        keys:
-        # This branch if available
-        - v1-dep-{{ .Branch }}-
-        # Default branch if not
-        - v1-dep-master-
-        # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
-        - v1-dep-
+
     # This is based on your 1.0 configuration file or project settings
     - run: make promu
-    - run: docker info
+    #- run: docker info # doesnt work
     # This is based on your 1.0 configuration file or project settings
     - run: promu crossbuild
     - run: ln -s .build/linux-amd64/apache_exporter apache_exporter
