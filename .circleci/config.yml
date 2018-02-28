@@ -13,9 +13,8 @@ jobs:
       DOCKER_TEST_IMAGE_NAME: quay.io/prometheus/golang-builder:1.8-base
       REPO_PATH: github.com/Lusitaniae/apache_exporter
 
-    docker:
-    - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
-      command: /sbin/init
+    machine:
+      image: circleci/classic:201708-01
 
     steps:
     - checkout
