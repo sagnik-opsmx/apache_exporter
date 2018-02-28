@@ -13,8 +13,9 @@ jobs:
       DOCKER_TEST_IMAGE_NAME: quay.io/prometheus/golang-builder:1.8-base
       REPO_PATH: github.com/Lusitaniae/apache_exporter
 
-    machine:
-      image: circleci/classic:201708-01
+    docker:
+    - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
+      command: /sbin/init
 
     steps:
     - checkout
@@ -43,7 +44,7 @@ jobs:
 
     # This is based on your 1.0 configuration file or project settings
     - run: make promu
-    #- run: docker info # doesnt work
+    - run: docker info
     # This is based on your 1.0 configuration file or project settings
     - run: promu crossbuild
     - run: ln -s .build/linux-amd64/apache_exporter apache_exporter
